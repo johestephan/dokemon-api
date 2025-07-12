@@ -693,8 +693,12 @@ Cookie: session=<session_cookie>
   "success": true,
   "user": {
     "username": "admin",
-    "login_time": "2024-01-15T10:30:00.000000",
-    "authenticated": true
+    "email": "admin@dokemon.local",
+    "created_at": "2025-07-12T10:30:00.000000",
+    "last_login": "2025-07-12T15:45:00.000000",
+    "login_time": "2025-07-12T15:45:00.000000",
+    "authenticated": true,
+    "is_admin": true
   }
 }
 ```
@@ -744,809 +748,229 @@ Cookie: session=<session_cookie>
 
 **Response:** Returns HTML page with "Dokémon NG" title and logout confirmation message. Perfect for browser-based applications that need a user-friendly logout page.
 
-#### Authentication Security Features
+##### Admin User Management Endpoints
 
-- **Password Hashing**: PBKDF2 with SHA-256 and random salt (100,000 iterations)
-- **Session Management**: Flask sessions with configurable timeout (default: 2 hours)
-- **File-based Storage**: User data stored in `users.json` (upgrade to database for production)
-- **Session Timeout**: Automatic logout after 24 hours of inactivity
-- **Password Requirements**: Minimum 8 characters, usernames minimum 3 characters
+**Note**: All admin endpoints require authentication with an admin user account.
 
-#### Using Authentication in Requests
-
-After login, include the session cookie in all subsequent requests:
-
+##### List All Users
 ```bash
-# Example: List containers with authentication
-curl -X GET http://localhost:9090/api/v1/containers \
-  -H "Cookie: session=<your_session_cookie>"
+GET /api/v1/users/list
+Cookie: session=<admin_session_cookie>
 ```
 
-#### Authentication Curl Examples
-
-##### Create New User
-```bash
-# Create a new user account
-curl -X POST http://localhost:9090/api/v1/users \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "newuser",
-    "password": "securepassword123",
-    "email": "user@example.com"
-  }'
-```
-
-##### Login (Get Session Cookie)
-```bash
-# Login and save session cookie
-curl -X POST http://localhost:9090/api/v1/users/login \
-  -H "Content-Type: application/json" \
-  -c cookies.txt \
-  -d '{
-    "username": "admin",
-    "password": "admin"
-  }'
-
-# Or login and extract cookie manually
-curl -X POST http://localhost:9090/api/v1/users/login \
-  -H "Content-Type: application/json" \
-  -v \
-  -d '{
-    "username": "admin",
-    "password": "admin"
-  }' 2>&1 | grep -i "set-cookie"
-```
-
-##### Get Current User Info
-```bash
-# Get current user information (requires login)
-curl -X GET http://localhost:9090/api/v1/users/me \
-  -b cookies.txt
-
-# Or with manual cookie
-curl -X GET http://localhost:9090/api/v1/users/me \
-  -H "Cookie: session=your_session_cookie_here"
-```
-
-##### Change Password
-```bash
-# Change user password (requires login)
-curl -X POST http://localhost:9090/api/v1/users/changepassword \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{
-    "currentPassword": "admin",
-    "newPassword": "newSecurePassword123"
-  }'
-```
-
-##### Logout (JSON Response)
-```bash
-# Logout via API (clears session)
-curl -X POST http://localhost:9090/api/v1/users/logout \
-  -b cookies.txt
-```
-
-##### Logout (HTML Page)
-```bash
-# Access logout page in browser or get HTML response
-curl -X GET http://localhost:9090/api/v1/users/logout \
-  -b cookies.txt
-
-# Open logout page in browser (for Dokémon NG app)
-open http://localhost:9090/api/v1/users/logout
-# or visit in browser: http://localhost:9090/api/v1/users/logout
-```
-
-##### Complete Authentication Workflow Example
-```bash
-# 1. Create user
-curl -X POST http://localhost:9090/api/v1/users \
-  -H "Content-Type: application/json" \
-  -d '{"username": "testuser", "password": "password123", "email": "test@example.com"}'
-
-# 2. Login and save session
-curl -X POST http://localhost:9090/api/v1/users/login \
-  -H "Content-Type: application/json" \
-  -c cookies.txt \
-  -d '{"username": "testuser", "password": "password123"}'
-
-# 3. Access protected resources
-curl -X GET http://localhost:9090/api/v1/users/me -b cookies.txt
-curl -X GET http://localhost:9090/api/v1/containers -b cookies.txt
-
-# 4. Change password
-curl -X POST http://localhost:9090/api/v1/users/changepassword \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{"currentPassword": "password123", "newPassword": "newpassword456"}'
-
-# 5. Logout
-curl -X POST http://localhost:9090/api/v1/users/logout -b cookies.txt
-```
-### Container Management
-
-#### List Containers
-```bash
-GET /api/v1/containers?all=true
-```
-Returns structured JSON with container details:
-```json
-{
-  "containers": [
-    {
-      "container_id": "c416bf187ea6",
-      "image": "nginx:latest",
-      "command": "\"/docker-entrypoint.sh nginx\"",
-      "created": "2 hours ago",
-      "status": "Up 2 hours",
-      "ports": "0.0.0.0:8080->80/tcp",
-      "names": "my-nginx"
-    }
-  ]
-}
-```
-
-#### Container Operations
-- `POST /api/v1/containers/{id}/start` - Start container
-- `POST /api/v1/containers/{id}/stop` - Stop container  
-- `POST /api/v1/containers/{id}/restart` - Restart container
-- `DELETE /api/v1/containers/{id}/remove?force=true` - Remove container
-- `GET /api/v1/containers/{id}/logs?tail=100` - Get container logs
-- `GET /api/v1/containers/{id}/inspect` - Get detailed container info
-- `POST /api/v1/containers/{id}/exec` - Execute command in container
-
-#### Run New Container
-```bash
-POST /api/v1/containers/run
-Content-Type: application/json
-```
-```json
-{
-  "image": "postgres:13",
-  "name": "my-postgres",
-  "detached": true,
-  "ports": ["5432:5432"],
-  "volumes": ["postgres-data:/var/lib/postgresql/data"],
-  "environment": ["POSTGRES_PASSWORD=secret", "POSTGRES_DB=myapp"],
-  "command": ""
-}
-```
-
-### Image Management
-
-#### List Images
-```bash
-GET /api/v1/images
-```
-Returns structured data:
-```json
-{
-  "images": [
-    {
-      "repository": "nginx",
-      "tag": "latest",
-      "image_id": "f8f4ffc8092c",
-      "created": "2 weeks ago",
-      "size": "109MB"
-    }
-  ]
-}
-```
-
-#### Image Operations
-- `POST /api/v1/images/pull` - Pull image from registry
-- `DELETE /api/v1/images/{id}/remove?force=true` - Remove image
-- `POST /api/v1/images/build` - Build image from Dockerfile
-
-### Network Management
-
-#### List Networks
-```bash
-GET /api/v1/networks
-```
-Returns structured network data:
-```json
-{
-  "networks": [
-    {
-      "network_id": "c416bf187ea6",
-      "name": "bridge",
-      "driver": "bridge",
-      "scope": "local"
-    }
-  ]
-}
-```
-
-#### Network Operations
-- `POST /api/v1/networks/create` - Create network
-- `DELETE /api/v1/networks/{name}/remove` - Remove network
-
-### Volume Management
-
-#### List Volumes
-```bash
-GET /api/v1/volumes
-```
-Returns structured volume data:
-```json
-{
-  "volumes": [
-    {
-      "driver": "local",
-      "volume_name": "postgres-data"
-    }
-  ]
-}
-```
-
-#### Volume Operations
-- `POST /api/v1/volumes/create` - Create volume
-- `DELETE /api/v1/volumes/{name}/remove` - Remove volume
-
-### System Operations
-
-#### System Information
-- `GET /api/v1/system/info` - Detailed Docker system information
-- `GET /api/v1/system/summary` - Key system statistics
-- `GET /api/v1/system/stats?no-stream=true` - Container resource usage
-- `POST /api/v1/system/prune?force=true` - Clean up unused objects
-
-#### System Summary Example
+**Response:**
 ```json
 {
   "success": true,
-  "summary": {
-    "docker_version": "20.10.17",
-    "containers": {
-      "total": 5,
-      "running": 3,
-      "paused": 0,
-      "stopped": 2
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@dokemon.local",
+      "created_at": "2025-07-12T10:00:00.000000",
+      "last_login": "2025-07-12T15:45:00.000000",
+      "active": true,
+      "is_admin": true
     },
-    "images": 12,
-    "storage_driver": "overlay2",
-    "operating_system": "Ubuntu 20.04.4 LTS",
-    "architecture": "x86_64",
-    "cpus": 4,
-    "total_memory": "7.775GiB"
+    {
+      "username": "testuser",
+      "email": "test@example.com",
+      "created_at": "2025-07-12T11:00:00.000000",
+      "last_login": "2025-07-12T14:30:00.000000",
+      "active": true,
+      "is_admin": false
+    }
+  ],
+  "count": 2
+}
+```
+
+##### Get User Details
+```bash
+GET /api/v1/users/<username>/info
+Cookie: session=<admin_session_cookie>
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "user": {
+    "username": "testuser",
+    "email": "test@example.com",
+    "created_at": "2025-07-12T11:00:00.000000",
+    "last_login": "2025-07-12T14:30:00.000000",
+    "active": true,
+    "is_admin": false
   }
 }
 ```
 
-## Usage Examples
-
-### Authentication Setup
-
+##### Deactivate User Account
 ```bash
-# First, login to get session cookie (using default admin account)
-curl -X POST http://localhost:9090/api/v1/users/login \
-  -H "Content-Type: application/json" \
-  -c cookies.txt \
-  -d '{
-    "username": "admin",
-    "password": "admin"
-  }'
-
-# Verify login worked
-curl -X GET http://localhost:9090/api/v1/users/me -b cookies.txt
-
-# IMPORTANT: Change default password immediately!
-curl -X POST http://localhost:9090/api/v1/users/changepassword \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{
-    "currentPassword": "admin",
-    "newPassword": "your-secure-password"
-  }'
+POST /api/v1/users/<username>/deactivate
+Cookie: session=<admin_session_cookie>
 ```
 
-### Basic Container Operations
-
-```bash
-# Check API health (no authentication required)
-curl http://localhost:9090/health
-
-# List all containers (may require authentication)
-curl "http://localhost:9090/api/v1/containers?all=true" -b cookies.txt
-
-# Run nginx container
-curl -X POST http://localhost:9090/api/v1/containers/run \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{
-    "image": "nginx:alpine",
-    "name": "web-server",
-    "detached": true,
-    "ports": ["8080:80"]
-  }'
-
-# Check container logs
-curl "http://localhost:9090/api/v1/containers/web-server/logs?tail=50" -b cookies.txt
-
-# Execute command in container
-curl -X POST http://localhost:9090/api/v1/containers/web-server/exec \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{"command": "nginx -v"}'
-
-# Stop and remove container
-curl -X POST http://localhost:9090/api/v1/containers/web-server/stop -b cookies.txt
-curl -X DELETE "http://localhost:9090/api/v1/containers/web-server/remove?force=true" -b cookies.txt
-```
-
-### Advanced Container with Database
-
-```bash
-# Create volume for data persistence
-curl -X POST http://localhost:9090/api/v1/volumes/create \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{"name": "postgres-data"}'
-
-# Run PostgreSQL with volume and environment
-curl -X POST http://localhost:9090/api/v1/containers/run \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{
-    "image": "postgres:13-alpine",
-    "name": "database",
-    "detached": true,
-    "ports": ["5432:5432"],
-    "volumes": ["postgres-data:/var/lib/postgresql/data"],
-    "environment": [
-      "POSTGRES_PASSWORD=secretpassword",
-      "POSTGRES_DB=myapp",
-      "POSTGRES_USER=appuser"
-    ]
-  }'
-```
-
-### Image Management
-
-```bash
-# Pull latest Redis image
-curl -X POST http://localhost:9090/api/v1/images/pull \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{"image": "redis:alpine"}'
-
-# List all images
-curl http://localhost:9090/api/v1/images -b cookies.txt
-curl http://localhost:9090/api/v1/images
-
-# Build custom image
-curl -X POST http://localhost:9090/api/v1/images/build \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{
-    "tag": "my-app:latest",
-    "path": "/path/to/dockerfile/directory",
-    "dockerfile": "Dockerfile"
-  }'
-```
-
-### Network Operations
-
-```bash
-# Create custom network
-curl -X POST http://localhost:9090/api/v1/networks/create \
-  -H "Content-Type: application/json" \
-  -b cookies.txt \
-  -d '{
-    "name": "my-network",
-    "driver": "bridge"
-  }'
-
-# List all networks
-curl http://localhost:9090/api/v1/networks -b cookies.txt
-```
-
-### System Monitoring
-
-```bash
-# Get system summary
-curl http://localhost:9090/api/v1/system/summary -b cookies.txt
-
-# Get resource statistics
-curl "http://localhost:9090/api/v1/system/stats?no-stream=true" -b cookies.txt
-
-# Clean up unused objects (with confirmation)
-curl -X POST "http://localhost:9090/api/v1/system/prune?force=true" -b cookies.txt
-```
-
-## Configuration
-
-### Environment Variables
-
-The API supports extensive configuration through environment variables:
-
-```bash
-# Server Configuration
-DOKEMON_HOST=0.0.0.0          # Server bind address
-DOKEMON_PORT=9090             # Server port
-DOKEMON_DEBUG=true            # Debug mode (true/false)
-
-# Docker Configuration  
-DOKEMON_DOCKER_TIMEOUT=30     # Docker command timeout (seconds)
-DOKEMON_VERSION_TIMEOUT=5     # Docker version check timeout
-
-# Security
-DOKEMON_ALLOWED_HOSTS=*       # Comma-separated allowed hosts
-
-# Logging
-DOKEMON_LOG_LEVEL=INFO        # Log level (DEBUG, INFO, WARNING, ERROR)
-
-# Environment Mode
-FLASK_ENV=development         # development, production, default
-```
-
-### Configuration Classes
-
-The API uses a sophisticated configuration system:
-- **Config**: Base configuration class
-- **DevelopmentConfig**: Debug enabled, verbose logging
-- **ProductionConfig**: Debug disabled, optimized for production
-
-## Security Considerations
-
-- **Docker Socket Access**: API requires access to Docker socket - use in trusted environments
-- **Authentication**: Implemented - Session-based authentication with PBKDF2 password hashing
-- **Default Credentials**: Change default admin password (admin/admin) immediately
-- **User Data Storage**: Currently file-based (`users.json`) - upgrade to database for production
-- **Session Security**: Configure `SECRET_KEY` environment variable for production
-- **Network Exposure**: Default binding to 0.0.0.0 - restrict in production
-- **Command Execution**: API can execute arbitrary commands in containers
-- **Resource Limits**: No built-in resource limiting - monitor usage
-
-## Response Format
-
-### Success Response
+**Response:**
 ```json
 {
   "success": true,
-  "output": "operation_result_or_data"
+  "message": "User account deactivated"
 }
 ```
 
-### Error Response
+##### Activate User Account
+```bash
+POST /api/v1/users/<username>/activate
+Cookie: session=<admin_session_cookie>
+```
+
+**Response:**
 ```json
 {
-  "success": false,
-  "error": "Detailed error message"
+  "success": true,
+  "message": "User account activated"
 }
 ```
 
-### Structured Data Response
+##### Delete User Account
+```bash
+DELETE /api/v1/users/<username>/delete
+Cookie: session=<admin_session_cookie>
+```
+
+**Response:**
 ```json
 {
-  "containers": [...],
-  "images": [...],
-  "networks": [...],
-  "volumes": [...]
+  "success": true,
+  "message": "User account deleted"
 }
 ```
 
-## Troubleshooting
-
-### Common Issues
-
-**"Docker is not accessible"**
+##### Reset User Password (Admin)
 ```bash
-# Check Docker status
-docker --version
-docker info
+POST /api/v1/users/<username>/reset-password
+Content-Type: application/json
+Cookie: session=<admin_session_cookie>
 
-# On Linux/macOS, check socket
-ls -la /var/run/docker.sock
-
-# Restart Docker service if needed
-sudo systemctl restart docker  # Linux
-# or restart Docker Desktop
+{
+  "newPassword": "newSecurePassword123"
+}
 ```
 
-**"ModuleNotFoundError: No module named 'flask'"**
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Password reset successfully"
+}
+```
+
+##### Promote User to Admin
 ```bash
-# Activate virtual environment
-source venv/bin/activate  # Linux/macOS
-venv\Scripts\activate.bat  # Windows
-
-# Install requirements
-pip install -r requirements.txt
+POST /api/v1/users/admin/promote/<username>
+Cookie: session=<admin_session_cookie>
 ```
 
-**"Permission denied" on Docker socket**
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User promoted to admin"
+}
+```
+
+##### Demote User from Admin
 ```bash
-# Linux - Add user to docker group
-sudo usermod -aG docker $USER
-# Then logout and login again
-
-# Windows - IMPORTANT: Container must run as root
-docker stop dokemon-api && docker rm dokemon-api
-docker run -d --name dokemon-api -p 9090:9090 -u root -v "/var/run/docker.sock:/var/run/docker.sock" -v dokemon_data:/app/data javastraat/dokemon-api:latest
-
-# OR use provided Windows scripts which handle this automatically
-docker-start.bat  # or .\docker-start.ps1
+POST /api/v1/users/admin/demote/<username>
+Cookie: session=<admin_session_cookie>
 ```
 
-**Windows Docker Desktop Issues**
-```cmd
-REM "Failed to connect to Docker daemon" or "protocol not available"
-REM 1. Check Docker Desktop is running in Linux container mode
-REM 2. Use debug endpoint for detailed diagnostics
-curl http://localhost:9090/docker-debug
-
-REM 3. Ensure container runs as root (Windows requirement)
-docker run -d --name dokemon-api -p 9090:9090 -u root -v "/var/run/docker.sock:/var/run/docker.sock" javastraat/dokemon-api:latest
-
-REM 4. Alternative: Enable Docker TCP API (less secure, development only)
-REM Docker Desktop > Settings > General > "Expose daemon on tcp://localhost:2375 without TLS"
-docker run -d --name dokemon-api -p 9090:9090 -e DOCKER_HOST=tcp://host.docker.internal:2375 javastraat/dokemon-api:latest
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User demoted from admin"
+}
 ```
 
-> **For comprehensive Windows troubleshooting**, see: [`WINDOWS_DOCKER_TROUBLESHOOTING.md`](WINDOWS_DOCKER_TROUBLESHOOTING.md)
+#### Admin Curl Examples
 
-**Port already in use**
+##### List All Users
 ```bash
-# Change port via environment variable
-export DOKEMON_PORT=8080
-python app.py
-
-# Or find and kill process using port 9090
-lsof -ti:9090 | xargs kill  # macOS/Linux
-netstat -ano | findstr :9090  # Windows
+# Get list of all users (admin only)
+curl -X GET http://localhost:9090/api/v1/users/list \
+  -b cookies.txt
 ```
 
-**Import errors in modular structure**
+##### User Account Management
 ```bash
-# Make sure you're running from the project root
-cd /path/to/dokemon-api
-python app.py
+# Get specific user information
+curl -X GET http://localhost:9090/api/v1/users/testuser/info \
+  -b cookies.txt
 
-# Check Python path if needed
-export PYTHONPATH=$PYTHONPATH:.
+# Deactivate a user account
+curl -X POST http://localhost:9090/api/v1/users/testuser/deactivate \
+  -b cookies.txt
+
+# Activate a user account
+curl -X POST http://localhost:9090/api/v1/users/testuser/activate \
+  -b cookies.txt
+
+# Reset user password (admin bypass)
+curl -X POST http://localhost:9090/api/v1/users/testuser/reset-password \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{"newPassword": "newResetPassword123"}'
+
+# Promote user to admin
+curl -X POST http://localhost:9090/api/v1/users/admin/promote/testuser \
+  -b cookies.txt
+
+# Demote user from admin
+curl -X POST http://localhost:9090/api/v1/users/admin/demote/testuser \
+  -b cookies.txt
+
+# Delete user account (permanent)
+curl -X DELETE http://localhost:9090/api/v1/users/testuser/delete \
+  -b cookies.txt
 ```
 
-## Development
-
-### Adding New Endpoints
-
-**1. To existing module (e.g., add container feature):**
-```python
-# Edit routes/containers.py
-@containers_bp.route('/<container_id>/pause', methods=['POST'])
-def pause_container(container_id):
-    command = f"docker pause {container_id}"
-    response, status = run_docker_command(command)
-    return jsonify(response), status
-```
-
-**2. New module (e.g., Docker Compose support):**
-```python
-# Create routes/compose.py
-from flask import Blueprint
-from utils.docker_utils import run_docker_command
-
-compose_bp = Blueprint('compose', __name__, url_prefix='/api/v1/compose')
-
-@compose_bp.route('/up', methods=['POST'])
-def compose_up():
-    # Implementation here
-    pass
-```
-
-```python
-# Add to app.py
-from routes.compose import compose_bp
-app.register_blueprint(compose_bp)
-```
-
-### Adding New Utilities
-
-**1. New parser function:**
-```python
-# Add to utils/parsers.py
-def parse_compose_output(output):
-    # Implementation here
-    pass
-```
-
-**2. New utility module:**
-```python
-# Create utils/new_feature.py
-def new_utility_function():
-    # Implementation here
-    pass
-```
-
-### Running in Production
-
-The Dokemon API is now configured to use **Gunicorn** as the production WSGI server for better performance, reliability, and scalability.
-
-#### Quick Start (Production)
-
+##### Complete Admin User Management Workflow
 ```bash
-# Using the production startup script
-./start-prod.sh
+# 1. Login as admin
+curl -X POST http://localhost:9090/api/v1/users/login \
+  -H "Content-Type: application/json" \
+  -c cookies.txt \
+  -d '{"username": "admin", "password": "admin"}'
 
-# Or manually
-export FLASK_ENV=production
-export DOKEMON_DEBUG=false
-gunicorn --config gunicorn.conf.py app:app
+# 2. List all users
+curl -X GET http://localhost:9090/api/v1/users/list \
+  -b cookies.txt
+
+# 3. Get specific user details
+curl -X GET http://localhost:9090/api/v1/users/testuser/info \
+  -b cookies.txt
+
+# 4. Manage user account status
+curl -X POST http://localhost:9090/api/v1/users/testuser/deactivate \
+  -b cookies.txt
+
+curl -X POST http://localhost:9090/api/v1/users/testuser/activate \
+  -b cookies.txt
+
+# 5. Admin privilege management
+curl -X POST http://localhost:9090/api/v1/users/admin/promote/testuser \
+  -b cookies.txt
+
+# 6. Reset user password
+curl -X POST http://localhost:9090/api/v1/users/testuser/reset-password \
+  -H "Content-Type: application/json" \
+  -b cookies.txt \
+  -d '{"newPassword": "newAdminSetPassword123"}'
+
+# 7. Final cleanup (if needed)
+curl -X DELETE http://localhost:9090/api/v1/users/testuser/delete \
+  -b cookies.txt
 ```
-
-#### Development Mode
-
-For development, you can still use Flask's built-in server:
-
-```bash
-# Using the development startup script
-./start-dev.sh
-
-# Or manually
-export FLASK_ENV=development
-export DOKEMON_DEBUG=true
-python app.py
-```
-
-#### Gunicorn Configuration
-
-The API includes a comprehensive Gunicorn configuration file (`gunicorn.conf.py`) with:
-
-- **Auto-scaling workers**: Automatically determines optimal worker count based on CPU cores
-- **Performance tuning**: Request timeouts, connection limits, and worker recycling
-- **Logging**: Structured access and error logging to stdout/stderr
-- **Security**: Request size limits and other security settings
-
-#### Environment Variables
-
-Control Gunicorn behavior with these environment variables:
-
-```bash
-# Server binding
-export DOKEMON_HOST=0.0.0.0          # Default: 0.0.0.0
-export DOKEMON_PORT=9090              # Default: 9090
-
-# Worker configuration
-export GUNICORN_WORKERS=4             # Default: auto (CPU cores * 2 + 1)
-export GUNICORN_LOG_LEVEL=info        # Default: info
-
-# Application environment
-export FLASK_ENV=production           # Default: production
-export DOKEMON_DEBUG=false           # Default: false
-```
-
-#### Production Deployment Options
-
-**Option 1: Systemd Service (Recommended)**
-
-```bash
-# Copy service file
-sudo cp dokemon-api.service /etc/systemd/system/
-
-# Create user and setup application
-sudo useradd -r -s /bin/false -G docker dokemon
-sudo mkdir -p /opt/dokemon-api
-sudo cp -r . /opt/dokemon-api/
-sudo chown -R dokemon:dokemon /opt/dokemon-api
-
-# Install dependencies
-cd /opt/dokemon-api
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Enable and start service
-sudo systemctl enable dokemon-api
-sudo systemctl start dokemon-api
-sudo systemctl status dokemon-api
-```
-
-**Option 2: Docker Deployment**
-
-The Docker image now uses Gunicorn by default:
-
-```bash
-# Build and run with Docker Compose
-docker-compose up -d
-
-# Or build manually
-docker build -t dokemon-api .
-docker run -d -p 9090:9090 \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -e FLASK_ENV=production \
-  -e DOKEMON_DEBUG=false \
-  dokemon-api
-```
-
-**Option 3: Manual Deployment**
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Set environment variables
-export FLASK_ENV=production
-export DOKEMON_DEBUG=false
-
-# Start with Gunicorn
-gunicorn --config gunicorn.conf.py app:app
-```
-
-#### Performance Benefits
-
-Using Gunicorn provides several advantages over Flask's development server:
-
-- **Multiple worker processes**: Better CPU utilization and request handling
-- **Process recycling**: Automatic worker restarts prevent memory leaks
-- **Production-grade logging**: Structured access logs and error handling
-- **Graceful shutdowns**: Proper signal handling for deployments
-- **Resource limits**: Built-in protection against resource exhaustion
-
-### Testing
-
-```bash
-# Test individual modules
-python -m pytest routes/test_containers.py
-python -m pytest utils/test_parsers.py
-
-# Test entire API
-python -m pytest tests/
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/new-endpoint`
-3. Follow the modular structure
-4. Add tests for new functionality
-5. Update documentation
-6. Submit pull request
-
-### Code Organization Guidelines
-
-- **Routes**: Put endpoint logic in appropriate route module
-- **Utils**: Put shared functionality in utils modules
-- **Config**: Add new configuration options to `config.py`
-- **Documentation**: Update README for new features
-
-## License
-
-This project is part of the Dokemon ecosystem. See project license for details.
-
-## Version History
-
-### **v1.0.20250712** *(NOT Production-Ready WSGI Server)*
-**Enhanced production deployment with Gunicorn WSGI server:**
-
-- **Gunicorn Integration**: Production-ready WSGI server replacing Flask development server
-- **Auto-scaling Configuration**: Intelligent worker process management based on CPU cores
-- **Comprehensive Configuration**: Dedicated `gunicorn.conf.py` with performance tuning
-- **Startup Scripts**: Dedicated `start-prod.sh` and `start-dev.sh` for different environments
-- **Systemd Service**: Ready-to-use systemd service file for Linux deployments
-- **Updated Docker**: Container now uses Gunicorn by default for production deployments
-- **Performance Improvements**: Better request handling, worker recycling, and resource management
-- **Enhanced Logging**: Structured access logs and error handling for production monitoring
-- **Graceful Shutdowns**: Proper signal handling for zero-downtime deployments
-- **Documentation Updates**: Comprehensive production deployment guide with multiple options
-
-*This release transforms the API into a production-ready service with enterprise-grade WSGI server capabilities, significantly improving performance, reliability, and deployment flexibility.*
-
-### **v1.0.20250712** *(Initial Release - NOT Production Ready yet)*
-**Complete Docker Management API with comprehensive feature set:**
-
-- **Complete Docker Management API**: Full container, image, network, and volume operations
-- **Modular Architecture**: Professional Flask Blueprints structure with utils/ and routes/
-- **Authentication System**: PBKDF2 password hashing, session management, user creation
-- **Cross-Platform Support**: Windows, macOS, and Linux with platform-specific scripts
-- **Docker Deployment**: Multi-stage optimized builds (~142MB vs 1.5GB+)
-- **Comprehensive Documentation**: Professional README with OpenAPI specification
-- **Windows Docker Desktop Support**: Root user execution and socket troubleshooting
-- **Environment Configuration**: Flexible config classes and environment variables
-- **Professional Error Handling**: Comprehensive timeout management and structured responses
-- **Development Tools**: Cross-platform build scripts and setup automation
-
-*This initial release represents a NONE complete, production-ready Docker management API with enterprise-grade features, comprehensive documentation, and cross-platform compatibility.*
-
 

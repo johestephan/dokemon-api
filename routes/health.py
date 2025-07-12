@@ -90,7 +90,15 @@ def api_documentation():
             "logout_api": "POST /api/v1/users/logout - Logout (JSON response)",
             "logout_page": "GET /api/v1/users/logout - Logout (HTML page)",
             "me": "GET /api/v1/users/me - Current user info",
-            "change_password": "POST /api/v1/users/changepassword - Change password"
+            "change_password": "POST /api/v1/users/changepassword - Change password",
+            "admin_list": "GET /api/v1/users/list - List all users (admin)",
+            "admin_info": "GET /api/v1/users/<username>/info - Get user info (admin)",
+            "admin_activate": "POST /api/v1/users/<username>/activate - Activate user (admin)",
+            "admin_deactivate": "POST /api/v1/users/<username>/deactivate - Deactivate user (admin)",
+            "admin_reset": "POST /api/v1/users/<username>/reset-password - Reset password (admin)",
+            "admin_promote": "POST /api/v1/users/admin/promote/<username> - Promote to admin",
+            "admin_demote": "POST /api/v1/users/admin/demote/<username> - Demote from admin",
+            "admin_delete": "DELETE /api/v1/users/<username>/delete - Delete user (admin)"
         }
     }
     

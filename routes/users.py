@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
 from datetime import datetime
-from flask import Blueprint, jsonify, request, session, Response, Response
-from utils.auth import (
+from flask import Blueprint, jsonify, request, session, Response
+from utils.auth_db import (
     create_user, authenticate_user, change_user_password, 
-    get_current_user, require_auth, create_default_admin
+    get_current_user, get_user_info, require_auth, require_admin, 
+    create_default_admin, list_users, deactivate_user, activate_user, 
+    delete_user, is_admin_user
 )
 
 # Create blueprint for user management
@@ -170,14 +172,31 @@ def get_current_user_info():
     username = get_current_user()
     login_time = session.get('login_time')
     
-    return jsonify({
-        "success": True,
-        "user": {
-            "username": username,
-            "login_time": login_time,
-            "authenticated": True
-        }
-    }), 200
+    # Get additional user info from database
+    user_info = get_user_info(username)
+    
+    if user_info:
+        return jsonify({
+            "success": True,
+            "user": {
+                "username": username,
+                "email": user_info.get('email'),
+                "created_at": user_info.get('created_at'),
+                "last_login": user_info.get('last_login'),
+                "login_time": login_time,
+                "authenticated": True,
+                "is_admin": user_info.get('is_admin', False)
+            }
+        }), 200
+    else:
+        return jsonify({
+            "success": True,
+            "user": {
+                "username": username,
+                "login_time": login_time,
+                "authenticated": True
+            }
+        }), 200
 
 # Add change password endpoint at the blueprint level
 @users_bp.route('/changepassword', methods=['POST'])
@@ -211,5 +230,242 @@ def change_password():
 # Initialize default admin user when blueprint is created
 def init_users():
     """Initialize user system with default admin if needed"""
-    from datetime import datetime
     create_default_admin()
+
+# Admin endpoints for user management
+@users_bp.route('/list', methods=['GET'])
+@require_admin
+def list_all_users():
+    """List all users (admin only)"""
+    users = list_users()
+    
+    return jsonify({
+        "success": True,
+        "users": users,
+        "count": len(users)
+    }), 200
+
+@users_bp.route('/<username>/info', methods=['GET'])
+@require_admin
+def get_user_details(username):
+    """Get detailed user information (admin only)"""
+    user_info = get_user_info(username)
+    
+    if user_info:
+        return jsonify({
+            "success": True,
+            "user": user_info
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "error": "User not found"
+        }), 404
+
+@users_bp.route('/<username>/deactivate', methods=['POST'])
+@require_admin
+def deactivate_user_account(username):
+    """Deactivate a user account (admin only)"""
+    current_user = get_current_user()
+    
+    # Prevent admin from deactivating themselves
+    if username == current_user:
+        return jsonify({
+            "success": False,
+            "error": "Cannot deactivate your own account"
+        }), 400
+    
+    success, message = deactivate_user(username)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "message": message
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "error": message
+        }), 400
+
+@users_bp.route('/<username>/activate', methods=['POST'])
+@require_admin
+def activate_user_account(username):
+    """Activate a user account (admin only)"""
+    success, message = activate_user(username)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "message": message
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "error": message
+        }), 400
+
+@users_bp.route('/<username>/delete', methods=['DELETE'])
+@require_admin
+def delete_user_account(username):
+    """Delete a user account (admin only)"""
+    current_user = get_current_user()
+    
+    # Prevent admin from deleting themselves
+    if username == current_user:
+        return jsonify({
+            "success": False,
+            "error": "Cannot delete your own account"
+        }), 400
+    
+    success, message = delete_user(username)
+    
+    if success:
+        return jsonify({
+            "success": True,
+            "message": message
+        }), 200
+    else:
+        return jsonify({
+            "success": False,
+            "error": message
+        }), 400
+
+@users_bp.route('/<username>/reset-password', methods=['POST'])
+@require_admin
+def admin_reset_password(username):
+    """Reset user password (admin only)"""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "JSON data required"}), 400
+    
+    new_password = data.get('newPassword')
+    
+    if not new_password:
+        return jsonify({"error": "New password is required"}), 400
+    
+    if len(new_password) < 8:
+        return jsonify({"error": "Password must be at least 8 characters"}), 400
+    
+    # For admin reset, we bypass the old password check
+    # This is a security-sensitive operation, so we use the database directly
+    try:
+        from utils.auth_db import hash_password, get_db_connection
+        password_data = hash_password(new_password)
+        
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                UPDATE users 
+                SET password_hash = ?, salt = ?, password_changed_at = ?
+                WHERE username = ?
+            ''', (
+                password_data['hash'],
+                password_data['salt'],
+                datetime.utcnow().isoformat(),
+                username
+            ))
+            
+            if cursor.rowcount > 0:
+                conn.commit()
+                return jsonify({
+                    "success": True,
+                    "message": "Password reset successfully"
+                }), 200
+            else:
+                return jsonify({
+                    "success": False,
+                    "error": "User not found"
+                }), 404
+                
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to reset password: {str(e)}"
+        }), 500
+
+@users_bp.route('/admin/promote/<username>', methods=['POST'])
+@require_admin
+def promote_to_admin(username):
+    """Promote a user to admin (admin only)"""
+    try:
+        from utils.auth_db import get_db_connection
+        
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                UPDATE users 
+                SET is_admin = 1 
+                WHERE username = ? AND active = 1
+            ''', (username,))
+            
+            if cursor.rowcount > 0:
+                conn.commit()
+                return jsonify({
+                    "success": True,
+                    "message": f"User {username} promoted to admin"
+                }), 200
+            else:
+                return jsonify({
+                    "success": False,
+                    "error": "User not found or inactive"
+                }), 404
+                
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to promote user: {str(e)}"
+        }), 500
+
+@users_bp.route('/admin/demote/<username>', methods=['POST'])
+@require_admin
+def demote_from_admin(username):
+    """Demote a user from admin (admin only)"""
+    current_user = get_current_user()
+    
+    # Prevent admin from demoting themselves
+    if username == current_user:
+        return jsonify({
+            "success": False,
+            "error": "Cannot demote yourself from admin"
+        }), 400
+    
+    try:
+        from utils.auth_db import get_db_connection
+        
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Check if this is the last admin user
+            cursor.execute("SELECT COUNT(*) as count FROM users WHERE is_admin = 1 AND active = 1")
+            admin_count = cursor.fetchone()['count']
+            
+            if admin_count <= 1:
+                return jsonify({
+                    "success": False,
+                    "error": "Cannot demote the last admin user"
+                }), 400
+            
+            cursor.execute('''
+                UPDATE users 
+                SET is_admin = 0 
+                WHERE username = ?
+            ''', (username,))
+            
+            if cursor.rowcount > 0:
+                conn.commit()
+                return jsonify({
+                    "success": True,
+                    "message": f"User {username} demoted from admin"
+                }), 200
+            else:
+                return jsonify({
+                    "success": False,
+                    "error": "User not found"
+                }), 404
+                
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to demote user: {str(e)}"
+        }), 500
