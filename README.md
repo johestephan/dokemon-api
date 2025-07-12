@@ -625,7 +625,7 @@ curl http://localhost:9090/docker-debug
 
 The endpoint provides actionable troubleshooting steps and exact commands to fix issues.
 
-### 🔐 User Authentication
+### 🔐 User Authentication (NOT YET done)
 
 The Dokemon API includes a comprehensive authentication system with session-based login, secure password hashing (PBKDF2), and user management capabilities.
 
