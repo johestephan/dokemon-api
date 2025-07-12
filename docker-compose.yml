@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   dokemon-api:
     build: 
@@ -40,32 +38,11 @@ services:
       - "com.dokemon.service=api"
       - "com.dokemon.version=1.0.20250712"
 
-  # Optional: Add a reverse proxy for production
-  nginx:
-    image: nginx:alpine
-    container_name: dokemon-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-    depends_on:
-      - dokemon-api
-    networks:
-      - dokemon-network
-    profiles:
-      - production
-
 volumes:
   dokemon_data:
     driver: local
-    labels:
-      - "com.dokemon.volume=data"
 
 networks:
   dokemon-network:
-    driver: bridge
-    labels:
-      - "com.dokemon.network=main"
+    driver: host
+
