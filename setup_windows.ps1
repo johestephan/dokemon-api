@@ -24,16 +24,16 @@ Write-Host "Activating virtual environment..." -ForegroundColor Yellow
 Write-Host "Upgrading pip..." -ForegroundColor Yellow
 python -m pip install --upgrade pip
 
-# Install Flask
-Write-Host "Installing Flask..." -ForegroundColor Yellow
-pip install Flask==2.0.3
+# Install requirements
+Write-Host "Installing requirements..." -ForegroundColor Yellow
+pip install -r src\requirements.txt
 
 Write-Host ""
 Write-Host "Setup complete!" -ForegroundColor Green
 Write-Host ""
 Write-Host "To run the Docker API server:" -ForegroundColor Cyan
 Write-Host "1. Activate the virtual environment: venv\Scripts\Activate.ps1" -ForegroundColor White
-Write-Host "2. Run the server: python app.py" -ForegroundColor White
+Write-Host "2. Run the server: cd src; python app.py" -ForegroundColor White
 Write-Host ""
 Write-Host "The API will be available at: http://localhost:9090" -ForegroundColor Cyan
 

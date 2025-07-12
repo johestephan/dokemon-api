@@ -32,13 +32,16 @@ WORKDIR /app
 COPY --from=builder /usr/local/bin/docker /usr/local/bin/docker
 
 # Copy requirements first for better layer caching
-COPY requirements.txt .
+COPY src/requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
-COPY . .
+# Copy application source code
+COPY src/ ./src/
+
+# Copy deployment configuration files (version.txt should be accessible from src directory)
+COPY version.txt ./src/
 
 # Create directory for user data
 RUN mkdir -p /app/data
@@ -54,8 +57,14 @@ RUN usermod -a -G docker app
 # Make data directory accessible
 RUN chmod 755 /app/data
 
+# Set Python path to include src directory
+ENV PYTHONPATH="/app/src"
+
 # Switch to app user for runtime
 USER app
+
+# Set working directory to src for proper imports
+WORKDIR /app/src
 
 # Expose port
 EXPOSE 9090
@@ -64,5 +73,5 @@ EXPOSE 9090
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:9090/health')" || exit 1
 
-# Default command - use Gunicorn for production
+# Default command - use Gunicorn for production (run from src directory)
 CMD ["gunicorn", "--config", "gunicorn.conf.py", "app:app"]

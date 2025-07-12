@@ -3,15 +3,21 @@
 Standalone database initialization script for Dokemon API
 Creates the SQLite database and tables without Flask dependencies
 Compatible with Python 2.7+ and Python 3.x
+
+This script should be run from the project root directory.
 """
 
 import sqlite3
 import hashlib
-import secrets
 import os
+try:
+    import secrets
+except ImportError:
+    # Fallback for older Python versions
+    secrets = None
 from datetime import datetime
 
-# Database configuration
+# Database configuration - matches the structure used by the application
 DATABASE_FILE = 'data/dokemon.db'
 DATABASE_DIR = 'data'
 

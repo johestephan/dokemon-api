@@ -15,7 +15,7 @@ Environment=DOKEMON_DEBUG=false
 Environment=DOKEMON_HOST=0.0.0.0
 Environment=DOKEMON_PORT=9090
 Environment=GUNICORN_WORKERS=4
-ExecStart=/opt/dokemon-api/venv/bin/gunicorn --config gunicorn.conf.py app:app
+ExecStart=/opt/dokemon-api/venv/bin/gunicorn --config src/gunicorn.conf.py src.app:app
 ExecReload=/bin/kill -s HUP $MAINPID
 Restart=always
 RestartSec=5

@@ -20,4 +20,5 @@ if %errorlevel% neq 0 (
 
 REM Start the API server
 echo Starting Docker API Server on port 9090...
+cd src
 python app.py

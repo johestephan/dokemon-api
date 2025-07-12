@@ -27,7 +27,7 @@ fi
 
 # Install/upgrade dependencies
 echo "📦 Installing dependencies..."
-pip install -r requirements.txt
+pip install -r src/requirements.txt
 
 # Show configuration
 echo ""
@@ -45,4 +45,6 @@ echo "API will be available at: http://${DOKEMON_HOST:-0.0.0.0}:${DOKEMON_PORT:-
 echo "Press Ctrl+C to stop"
 echo ""
 
-exec gunicorn --config gunicorn.conf.py app:app
+# Add src to Python path and run Gunicorn
+export PYTHONPATH="${PYTHONPATH}:./src"
+exec gunicorn --config src/gunicorn.conf.py src.app:app

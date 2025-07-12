@@ -139,15 +139,15 @@ The Dokemon API uses a professional modular architecture for easy maintenance an
 
 ```
 dokemon-api/
-├── app.py                         # Main application (45 lines - clean & simple!)
-├── config.py                      # Configuration management
-├── requirements.txt               # Python dependencies
 ├── README.md                     # This documentation
 ├── version.txt                   # Software version
+├── create_database.py            # Database initialization script
 ├── setup.sh                      # Linux/macOS setup script
 ├── setup_windows.bat             # Windows setup script
 ├── setup_windows.ps1             # PowerShell setup script
 ├── start_windows.bat             # Windows start script
+├── start-dev.sh                  # Development mode startup script
+├── start-prod.sh                 # Production mode startup script
 ├── WINDOWS_SETUP.md              # Windows-specific guide
 ├── WINDOWS_DOCKER_TROUBLESHOOTING.md  # Windows Docker troubleshooting
 ├── Dockerfile                    # Optimized Docker container (multi-stage build)
@@ -158,23 +158,30 @@ dokemon-api/
 ├── docker-start.bat              # Windows Docker start script
 ├── docker-build.ps1              # PowerShell Docker build script
 ├── docker-start.ps1              # PowerShell Docker start script
+├── dokemon-api.service           # Systemd service configuration
 ├── nginx.conf                    # Nginx reverse proxy config
 ├── .dockerignore                 # Docker build exclusions
 ├── dokemon-api.yaml              # OpenAPI specification for RapidAPI
-├── utils/                        # Utility modules
-│   ├── __init__.py
-│   ├── auth.py                   # Authentication & user management
-│   ├── docker_utils.py           # Docker command execution
-│   └── parsers.py                # Data parsing functions
-└── routes/                       # Modular route blueprints
-    ├── __init__.py
-    ├── health.py                 # Health check & API documentation
-    ├── containers.py             # Container management endpoints
-    ├── images.py                 # Image management endpoints
-    ├── networks.py               # Network management endpoints
-    ├── volumes.py                # Volume management endpoints
-    ├── users.py                  # User authentication endpoints
-    └── system.py                 # System operations endpoints
+├── backup/                       # Backup files
+└── src/                          # Application source code
+    ├── app.py                    # Main application (45 lines - clean & simple!)
+    ├── config.py                 # Configuration management
+    ├── requirements.txt          # Python dependencies
+    ├── gunicorn.conf.py          # Production WSGI server configuration
+    ├── utils/                    # Utility modules
+    │   ├── __init__.py
+    │   ├── auth_db.py            # Database-based authentication & user management
+    │   ├── docker_utils.py       # Docker command execution
+    │   └── parsers.py            # Data parsing functions
+    └── routes/                   # Modular route blueprints
+        ├── __init__.py
+        ├── health.py             # Health check & API documentation
+        ├── containers.py         # Container management endpoints
+        ├── images.py             # Image management endpoints
+        ├── networks.py           # Network management endpoints
+        ├── volumes.py            # Volume management endpoints
+        ├── users.py              # User authentication endpoints
+        └── system.py             # System operations endpoints
 ```
 
 ### **Modular Benefits:**
@@ -189,16 +196,16 @@ dokemon-api/
 
 | Module | Purpose | Endpoints |
 |--------|---------|-----------|
-| `health.py` | Health checks & API docs | `/health`, `/` |
-| `containers.py` | Container operations | `/api/v1/containers/*` |
-| `images.py` | Image operations | `/api/v1/images/*` |
-| `networks.py` | Network operations | `/api/v1/networks/*` |
-| `volumes.py` | Volume operations | `/api/v1/volumes/*` |
-| `system.py` | System operations | `/api/v1/system/*` |
-| `users.py` | User authentication | `/api/v1/users/*` |
-| `auth.py` | Authentication utilities | Shared utility |
-| `docker_utils.py` | Docker command execution | Shared utility |
-| `parsers.py` | Output parsing | Shared utility |
+| `src/routes/health.py` | Health checks & API docs | `/health`, `/` |
+| `src/routes/containers.py` | Container operations | `/api/v1/containers/*` |
+| `src/routes/images.py` | Image operations | `/api/v1/images/*` |
+| `src/routes/networks.py` | Network operations | `/api/v1/networks/*` |
+| `src/routes/volumes.py` | Volume operations | `/api/v1/volumes/*` |
+| `src/routes/system.py` | System operations | `/api/v1/system/*` |
+| `src/routes/users.py` | User authentication | `/api/v1/users/*` |
+| `src/utils/auth_db.py` | Database authentication | Shared utility |
+| `src/utils/docker_utils.py` | Docker command execution | Shared utility |
+| `src/utils/parsers.py` | Output parsing | Shared utility |
 
 ## Prerequisites
 

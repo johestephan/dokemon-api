@@ -27,7 +27,7 @@ fi
 
 # Install/upgrade dependencies
 echo "📦 Installing dependencies..."
-pip install -r requirements.txt
+pip install -r src/requirements.txt
 
 # Show configuration
 echo ""
@@ -44,4 +44,7 @@ echo "API will be available at: http://${DOKEMON_HOST:-0.0.0.0}:${DOKEMON_PORT:-
 echo "Press Ctrl+C to stop"
 echo ""
 
+# Add src to Python path and run
+export PYTHONPATH="${PYTHONPATH}:./src"
+cd src
 exec python app.py

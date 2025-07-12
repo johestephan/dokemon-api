@@ -23,15 +23,15 @@ echo Upgrading pip...
 python -m pip install --upgrade pip
 
 REM Install requirements
-echo Installing Flask...
-pip install Flask==2.0.3
+echo Installing requirements...
+pip install -r src\requirements.txt
 
 echo.
 echo Setup complete!
 echo.
 echo To run the Docker API server:
 echo 1. Activate the virtual environment: venv\Scripts\activate.bat
-echo 2. Run the server: python app.py
+echo 2. Run the server: cd src ^&^& python app.py
 echo.
 echo The API will be available at: http://localhost:9090
 pause

@@ -17,6 +17,8 @@ services:
       - dokemon_data:/app/data
       # Optional: Mount custom config
       - ./config:/app/config:ro
+      # Optional: Mount source code for development (uncomment for dev mode)
+      # - ./src:/app/src:ro
     environment:
       - FLASK_ENV=production
       - DOKEMON_HOST=0.0.0.0
