@@ -1,0 +1,1062 @@
+openapi: 3.0.3
+info:
+  title: Dokémon NG API
+  description: |
+    A comprehensive RESTful API server for Docker management - part of the Dokémon project ecosystem. 
+    This API provides complete Docker control via `/var/run/docker.sock` with structured JSON responses, 
+    professional configuration management, and a clean modular architecture.
+    
+    ## Features
+    - Complete Container Management (start, stop, restart, remove, run, logs, exec)
+    - Image Management (list, pull, remove, build)
+    - Network Management (create, list, remove)
+    - Volume Management (create, list, remove)
+    - System Operations (info, stats, cleanup)
+    - User Authentication & Session Management
+    - Structured JSON Responses
+    - Cross-Platform Support (Windows, macOS, Linux)
+    
+    ## Authentication
+    The API uses session-based authentication with secure password hashing (PBKDF2).
+    Default admin credentials: username=admin, password=admin (change immediately!)
+    
+  version: 1.0.20250712
+  contact:
+    name: Dokémon NG Team
+    url: https://github.com/dokemon-ng
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:9090
+    description: Local development server
+  - url: https://api.dokemon.ng
+    description: Production server (if applicable)
+
+tags:
+  - name: Health
+    description: Health check and API documentation
+  - name: Authentication
+    description: User authentication and session management
+  - name: Containers
+    description: Docker container management operations
+  - name: Images
+    description: Docker image management operations
+  - name: Networks
+    description: Docker network management operations
+  - name: Volumes
+    description: Docker volume management operations
+  - name: System
+    description: Docker system information and operations
+
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: session
+      description: Session-based authentication using cookies
+  
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+        docker_version:
+          type: string
+        software_name:
+          type: string
+          example: "Dokémon NG"
+        software_version:
+          type: string
+          example: "1.0.20250712"
+        error:
+          type: string
+          description: Error message when status is unhealthy
+    
+    ApiDocumentation:
+      type: object
+      properties:
+        message:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        software_name:
+          type: string
+        software_version:
+          type: string
+        endpoints:
+          type: object
+    
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+        password:
+          type: string
+          minLength: 8
+        email:
+          type: string
+          format: email
+      required:
+        - username
+        - password
+    
+    UserResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        username:
+          type: string
+    
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    
+    ChangePasswordRequest:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          minLength: 8
+      required:
+        - currentPassword
+        - newPassword
+    
+    Container:
+      type: object
+      properties:
+        container_id:
+          type: string
+        image:
+          type: string
+        command:
+          type: string
+        created:
+          type: string
+        status:
+          type: string
+        ports:
+          type: string
+        names:
+          type: string
+    
+    ContainerList:
+      type: object
+      properties:
+        containers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Container'
+    
+    RunContainerRequest:
+      type: object
+      properties:
+        image:
+          type: string
+        name:
+          type: string
+        detached:
+          type: boolean
+          default: true
+        ports:
+          type: array
+          items:
+            type: string
+        volumes:
+          type: array
+          items:
+            type: string
+        environment:
+          type: array
+          items:
+            type: string
+        command:
+          type: string
+      required:
+        - image
+    
+    Image:
+      type: object
+      properties:
+        repository:
+          type: string
+        tag:
+          type: string
+        image_id:
+          type: string
+        created:
+          type: string
+        size:
+          type: string
+    
+    ImageList:
+      type: object
+      properties:
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+    
+    PullImageRequest:
+      type: object
+      properties:
+        image:
+          type: string
+      required:
+        - image
+    
+    Network:
+      type: object
+      properties:
+        network_id:
+          type: string
+        name:
+          type: string
+        driver:
+          type: string
+        scope:
+          type: string
+    
+    NetworkList:
+      type: object
+      properties:
+        networks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Network'
+    
+    CreateNetworkRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        driver:
+          type: string
+          default: bridge
+      required:
+        - name
+    
+    Volume:
+      type: object
+      properties:
+        driver:
+          type: string
+        volume_name:
+          type: string
+    
+    VolumeList:
+      type: object
+      properties:
+        volumes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Volume'
+    
+    CreateVolumeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    
+    SystemSummary:
+      type: object
+      properties:
+        success:
+          type: boolean
+        summary:
+          type: object
+          properties:
+            docker_version:
+              type: string
+            containers:
+              type: object
+              properties:
+                total:
+                  type: integer
+                running:
+                  type: integer
+                paused:
+                  type: integer
+                stopped:
+                  type: integer
+            images:
+              type: integer
+            storage_driver:
+              type: string
+            operating_system:
+              type: string
+            architecture:
+              type: string
+            cpus:
+              type: integer
+            total_memory:
+              type: string
+    
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: string
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health Check
+      description: Check if Docker is running and accessible
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '500':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /:
+    get:
+      tags:
+        - Health
+      summary: API Documentation
+      description: Get API documentation and available endpoints
+      responses:
+        '200':
+          description: API documentation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiDocumentation'
+
+  /api/v1/users:
+    post:
+      tags:
+        - Authentication
+      summary: Create User
+      description: Create a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid input or user already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/users/login:
+    post:
+      tags:
+        - Authentication
+      summary: User Login
+      description: Authenticate user and create session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+          headers:
+            Set-Cookie:
+              description: Session cookie
+              schema:
+                type: string
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/users/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User Logout (JSON)
+      description: Logout user and clear session (JSON response)
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+    
+    get:
+      tags:
+        - Authentication
+      summary: User Logout (HTML)
+      description: Logout user and display HTML page (for browser integration)
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Logout page displayed
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /api/v1/users/me:
+    get:
+      tags:
+        - Authentication
+      summary: Current User Info
+      description: Get information about the currently logged-in user
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: User information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  user:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                      login_time:
+                        type: string
+                      authenticated:
+                        type: boolean
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/users/changepassword:
+    post:
+      tags:
+        - Authentication
+      summary: Change Password
+      description: Change the password for the current user
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid password or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/containers:
+    get:
+      tags:
+        - Containers
+      summary: List Containers
+      description: List all Docker containers
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: all
+          in: query
+          description: Include stopped containers
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: List of containers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContainerList'
+
+  /api/v1/containers/run:
+    post:
+      tags:
+        - Containers
+      summary: Run Container
+      description: Create and run a new Docker container
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunContainerRequest'
+      responses:
+        '200':
+          description: Container started successfully
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/containers/{id}/start:
+    post:
+      tags:
+        - Containers
+      summary: Start Container
+      description: Start a stopped Docker container
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Container ID or name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Container started successfully
+        '404':
+          description: Container not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/containers/{id}/stop:
+    post:
+      tags:
+        - Containers
+      summary: Stop Container
+      description: Stop a running Docker container
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Container ID or name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Container stopped successfully
+        '404':
+          description: Container not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/containers/{id}/restart:
+    post:
+      tags:
+        - Containers
+      summary: Restart Container
+      description: Restart a Docker container
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Container ID or name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Container restarted successfully
+        '404':
+          description: Container not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/containers/{id}/remove:
+    delete:
+      tags:
+        - Containers
+      summary: Remove Container
+      description: Remove a Docker container
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Container ID or name
+          schema:
+            type: string
+        - name: force
+          in: query
+          description: Force removal of running container
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Container removed successfully
+        '404':
+          description: Container not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/containers/{id}/logs:
+    get:
+      tags:
+        - Containers
+      summary: Get Container Logs
+      description: Retrieve logs from a Docker container
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Container ID or name
+          schema:
+            type: string
+        - name: tail
+          in: query
+          description: Number of lines to show from the end of logs
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Container logs
+        '404':
+          description: Container not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/containers/{id}/inspect:
+    get:
+      tags:
+        - Containers
+      summary: Inspect Container
+      description: Get detailed information about a Docker container
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Container ID or name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Container details
+        '404':
+          description: Container not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/containers/{id}/exec:
+    post:
+      tags:
+        - Containers
+      summary: Execute Command
+      description: Execute a command inside a Docker container
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Container ID or name
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                command:
+                  type: string
+              required:
+                - command
+      responses:
+        '200':
+          description: Command executed successfully
+        '404':
+          description: Container not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/images:
+    get:
+      tags:
+        - Images
+      summary: List Images
+      description: List all Docker images
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: List of images
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageList'
+
+  /api/v1/images/pull:
+    post:
+      tags:
+        - Images
+      summary: Pull Image
+      description: Pull a Docker image from registry
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PullImageRequest'
+      responses:
+        '200':
+          description: Image pulled successfully
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/images/{id}/remove:
+    delete:
+      tags:
+        - Images
+      summary: Remove Image
+      description: Remove a Docker image
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Image ID or name
+          schema:
+            type: string
+        - name: force
+          in: query
+          description: Force removal of image
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Image removed successfully
+        '404':
+          description: Image not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/images/build:
+    post:
+      tags:
+        - Images
+      summary: Build Image
+      description: Build a Docker image from Dockerfile
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tag:
+                  type: string
+                path:
+                  type: string
+                dockerfile:
+                  type: string
+                  default: Dockerfile
+              required:
+                - tag
+                - path
+      responses:
+        '200':
+          description: Image built successfully
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/networks:
+    get:
+      tags:
+        - Networks
+      summary: List Networks
+      description: List all Docker networks
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: List of networks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkList'
+
+  /api/v1/networks/create:
+    post:
+      tags:
+        - Networks
+      summary: Create Network
+      description: Create a new Docker network
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNetworkRequest'
+      responses:
+        '200':
+          description: Network created successfully
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/networks/{name}/remove:
+    delete:
+      tags:
+        - Networks
+      summary: Remove Network
+      description: Remove a Docker network
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Network name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Network removed successfully
+        '404':
+          description: Network not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/volumes:
+    get:
+      tags:
+        - Networks
+      summary: List Volumes
+      description: List all Docker volumes
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: List of volumes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolumeList'
+
+  /api/v1/volumes/create:
+    post:
+      tags:
+        - Volumes
+      summary: Create Volume
+      description: Create a new Docker volume
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVolumeRequest'
+      responses:
+        '200':
+          description: Volume created successfully
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/volumes/{name}/remove:
+    delete:
+      tags:
+        - Volumes
+      summary: Remove Volume
+      description: Remove a Docker volume
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Volume name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Volume removed successfully
+        '404':
+          description: Volume not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/system/info:
+    get:
+      tags:
+        - System
+      summary: System Information
+      description: Get detailed Docker system information
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Detailed system information
+
+  /api/v1/system/summary:
+    get:
+      tags:
+        - System
+      summary: System Summary
+      description: Get key Docker system statistics
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: System summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemSummary'
+
+  /api/v1/system/stats:
+    get:
+      tags:
+        - System
+      summary: Resource Statistics
+      description: Get Docker container resource usage statistics
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: no-stream
+          in: query
+          description: Return single measurement instead of stream
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Resource statistics
+
+  /api/v1/system/prune:
+    post:
+      tags:
+        - System
+      summary: System Cleanup
+      description: Clean up unused Docker objects (containers, images, networks, volumes)
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: force
+          in: query
+          description: Force cleanup without confirmation
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Cleanup completed successfully
