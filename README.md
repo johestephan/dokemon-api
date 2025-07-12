@@ -1517,7 +1517,7 @@ This project is part of the Dokemon ecosystem. See project license for details.
 
 ## Version History
 
-### **v1.1.20250712** *(Production-Ready WSGI Server)*
+### **v1.1.20250712** *(NOT Production-Ready WSGI Server)*
 **Enhanced production deployment with Gunicorn WSGI server:**
 
 - **Gunicorn Integration**: Production-ready WSGI server replacing Flask development server
