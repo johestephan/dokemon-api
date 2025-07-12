@@ -133,7 +133,7 @@ chmod +x setup.sh && ./setup.sh && python app.py
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 The Dokemon API uses a professional modular architecture for easy maintenance and scalability:
 
@@ -177,15 +177,15 @@ dokemon-api/
     └── system.py                 # System operations endpoints
 ```
 
-### 🎯 **Modular Benefits:**
+### **Modular Benefits:**
 
-- **📁 Organized by Functionality**: Each module handles one specific area
-- **� Easy Maintenance**: Add new features by editing relevant module
-- **🧪 Testable**: Each module can be tested independently
-- **📖 Readable**: Clear separation of concerns
-- **🚀 Scalable**: Easy to extend with new endpoints or features
+- **Organized by Functionality**: Each module handles one specific area
+- **Easy Maintenance**: Add new features by editing relevant module
+- **Testable**: Each module can be tested independently
+- **Readable**: Clear separation of concerns
+- **Scalable**: Easy to extend with new endpoints or features
 
-### �📋 **Module Breakdown:**
+### **Module Breakdown:**
 
 | Module | Purpose | Endpoints |
 |--------|---------|-----------|
@@ -200,7 +200,7 @@ dokemon-api/
 | `docker_utils.py` | Docker command execution | Shared utility |
 | `parsers.py` | Output parsing | Shared utility |
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Python 3.6+ 
 - Docker installed and running
@@ -345,7 +345,7 @@ docker-start.bat javastraat/dokemon-api custom-tag dokemon-container 8080 9090
 .\docker-start.ps1 -ImageName "javastraat/dokemon-api" -Tag "custom-tag" -ContainerName "dokemon-container" -HostPort 8080
 ```
 
-> **� Windows Docker Socket Solution:**  
+> **Windows Docker Socket Solution:**  
 > **IMPORTANT**: For Windows Docker Desktop compatibility, the container must run as **root user** to access the Docker socket properly. The Windows scripts automatically use `-u root` flag and mount `/var/run/docker.sock:/var/run/docker.sock`. This matches the configuration of working Docker management containers. If you get "permission denied" errors, ensure:
 > - Docker Desktop is running in **Linux container mode** (not Windows containers)
 > - Use the provided scripts which include the `-u root` flag
@@ -378,7 +378,7 @@ docker run -d ^
   javastraat/dokemon-api:latest
 ```
 
-**🚨 Windows Important Note:**
+**Windows Important Note:**
 The Windows container **must run as root** (`-u root`) to access Docker socket properly. This is required for Docker Desktop compatibility and matches the configuration of other working Docker management tools.
 
 **With Custom Environment:**
@@ -634,7 +634,7 @@ The Dokemon API includes a comprehensive authentication system with session-base
 When first started, the API creates a default admin user:
 - **Username**: `admin`
 - **Password**: `admin`
-- **⚠️ Important**: Change this password immediately after first login!
+- **Important**: Change this password immediately after first login!
 
 #### Authentication Endpoints
 
@@ -1192,8 +1192,8 @@ The API uses a sophisticated configuration system:
 ## Security Considerations
 
 - **Docker Socket Access**: API requires access to Docker socket - use in trusted environments
-- **Authentication**: ✅ **Implemented** - Session-based authentication with PBKDF2 password hashing
-- **Default Credentials**: ⚠️ Change default admin password (admin/admin) immediately
+- **Authentication**: Implemented - Session-based authentication with PBKDF2 password hashing
+- **Default Credentials**: Change default admin password (admin/admin) immediately
 - **User Data Storage**: Currently file-based (`users.json`) - upgrade to database for production
 - **Session Security**: Configure `SECRET_KEY` environment variable for production
 - **Network Exposure**: Default binding to 0.0.0.0 - restrict in production
@@ -1285,7 +1285,7 @@ REM Docker Desktop > Settings > General > "Expose daemon on tcp://localhost:2375
 docker run -d --name dokemon-api -p 9090:9090 -e DOCKER_HOST=tcp://host.docker.internal:2375 javastraat/dokemon-api:latest
 ```
 
-> **📖 For comprehensive Windows troubleshooting**, see: [`WINDOWS_DOCKER_TROUBLESHOOTING.md`](WINDOWS_DOCKER_TROUBLESHOOTING.md)
+> **For comprehensive Windows troubleshooting**, see: [`WINDOWS_DOCKER_TROUBLESHOOTING.md`](WINDOWS_DOCKER_TROUBLESHOOTING.md)
 
 **Port already in use**
 ```bash
@@ -1308,7 +1308,7 @@ python app.py
 export PYTHONPATH=$PYTHONPATH:.
 ```
 
-## 🔧 Development
+## Development
 
 ### Adding New Endpoints
 
