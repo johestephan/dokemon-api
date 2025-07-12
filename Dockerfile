@@ -64,5 +64,5 @@ EXPOSE 9090
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:9090/health')" || exit 1
 
-# Default command
-CMD ["python", "app.py"]
+# Default command - use Gunicorn for production
+CMD ["gunicorn", "--config", "gunicorn.conf.py", "app:app"]

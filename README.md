@@ -625,7 +625,7 @@ curl http://localhost:9090/docker-debug
 
 The endpoint provides actionable troubleshooting steps and exact commands to fix issues.
 
-### 🔐 User Authentication (NOT YET done)
+### 🔐 User Authentication (NOT YET)
 
 The Dokemon API includes a comprehensive authentication system with session-based login, secure password hashing (PBKDF2), and user management capabilities.
 
@@ -1361,16 +1361,127 @@ def new_utility_function():
 
 ### Running in Production
 
-For production deployment, consider:
-```bash
-# Use production WSGI server
-pip install gunicorn
-gunicorn -w 4 -b 0.0.0.0:9090 app:app
+The Dokemon API is now configured to use **Gunicorn** as the production WSGI server for better performance, reliability, and scalability.
 
-# Set production environment
+#### 🚀 Quick Start (Production)
+
+```bash
+# Using the production startup script
+./start-prod.sh
+
+# Or manually
 export FLASK_ENV=production
 export DOKEMON_DEBUG=false
+gunicorn --config gunicorn.conf.py app:app
 ```
+
+#### 🔧 Development Mode
+
+For development, you can still use Flask's built-in server:
+
+```bash
+# Using the development startup script
+./start-dev.sh
+
+# Or manually
+export FLASK_ENV=development
+export DOKEMON_DEBUG=true
+python app.py
+```
+
+#### ⚙️ Gunicorn Configuration
+
+The API includes a comprehensive Gunicorn configuration file (`gunicorn.conf.py`) with:
+
+- **Auto-scaling workers**: Automatically determines optimal worker count based on CPU cores
+- **Performance tuning**: Request timeouts, connection limits, and worker recycling
+- **Logging**: Structured access and error logging to stdout/stderr
+- **Security**: Request size limits and other security settings
+
+#### 🌐 Environment Variables
+
+Control Gunicorn behavior with these environment variables:
+
+```bash
+# Server binding
+export DOKEMON_HOST=0.0.0.0          # Default: 0.0.0.0
+export DOKEMON_PORT=9090              # Default: 9090
+
+# Worker configuration
+export GUNICORN_WORKERS=4             # Default: auto (CPU cores * 2 + 1)
+export GUNICORN_LOG_LEVEL=info        # Default: info
+
+# Application environment
+export FLASK_ENV=production           # Default: production
+export DOKEMON_DEBUG=false           # Default: false
+```
+
+#### 🎯 Production Deployment Options
+
+**Option 1: Systemd Service (Recommended)**
+
+```bash
+# Copy service file
+sudo cp dokemon-api.service /etc/systemd/system/
+
+# Create user and setup application
+sudo useradd -r -s /bin/false -G docker dokemon
+sudo mkdir -p /opt/dokemon-api
+sudo cp -r . /opt/dokemon-api/
+sudo chown -R dokemon:dokemon /opt/dokemon-api
+
+# Install dependencies
+cd /opt/dokemon-api
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Enable and start service
+sudo systemctl enable dokemon-api
+sudo systemctl start dokemon-api
+sudo systemctl status dokemon-api
+```
+
+**Option 2: Docker Deployment**
+
+The Docker image now uses Gunicorn by default:
+
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+
+# Or build manually
+docker build -t dokemon-api .
+docker run -d -p 9090:9090 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -e FLASK_ENV=production \
+  -e DOKEMON_DEBUG=false \
+  dokemon-api
+```
+
+**Option 3: Manual Deployment**
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Set environment variables
+export FLASK_ENV=production
+export DOKEMON_DEBUG=false
+
+# Start with Gunicorn
+gunicorn --config gunicorn.conf.py app:app
+```
+
+#### 📊 Performance Benefits
+
+Using Gunicorn provides several advantages over Flask's development server:
+
+- **Multiple worker processes**: Better CPU utilization and request handling
+- **Process recycling**: Automatic worker restarts prevent memory leaks
+- **Production-grade logging**: Structured access logs and error handling
+- **Graceful shutdowns**: Proper signal handling for deployments
+- **Resource limits**: Built-in protection against resource exhaustion
 
 ### Testing
 

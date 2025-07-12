@@ -1,0 +1,40 @@
+[Unit]
+Description=Dokemon API - Docker Management REST API
+After=network.target docker.service
+Requires=docker.service
+Wants=network.target
+
+[Service]
+Type=exec
+User=dokemon
+Group=docker
+WorkingDirectory=/opt/dokemon-api
+Environment=PATH=/opt/dokemon-api/venv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=FLASK_ENV=production
+Environment=DOKEMON_DEBUG=false
+Environment=DOKEMON_HOST=0.0.0.0
+Environment=DOKEMON_PORT=9090
+Environment=GUNICORN_WORKERS=4
+ExecStart=/opt/dokemon-api/venv/bin/gunicorn --config gunicorn.conf.py app:app
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=30
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/dokemon-api
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target

@@ -40,31 +40,35 @@ def create_app():
     
     return app
 
+def print_startup_info(app):
+    """Print startup information for development server"""
+    print(f"Starting {app.config.get('API_NAME', 'Dokemon API')} on port {app.config.get('PORT', 9090)}...")
+    print("Docker Management API - A RESTful interface for Docker operations")
+    print("Make sure Docker is running and accessible via /var/run/docker.sock")
+    print(f"API Documentation available at: http://localhost:{app.config.get('PORT', 9090)}/")
+    print("\n📁 Modular Structure:")
+    print("   - Health & Documentation: /health, /")
+    print("   - Containers: /api/v1/containers/*")
+    print("   - Images: /api/v1/images/*")
+    print("   - Networks: /api/v1/networks/*") 
+    print("   - Volumes: /api/v1/volumes/*")
+    print("   - System: /api/v1/system/*")
+    print("   - Users: /api/v1/users/*")
+    print("\n🔐 Authentication:")
+    print("   - Create User: POST /api/v1/users")
+    print("   - Login: POST /api/v1/users/login")
+    print("   - Logout: POST /api/v1/users/logout")
+    print("   - Change Password: POST /api/v1/users/changepassword")
+    print("   - Current User: GET /api/v1/users/me")
+    print("   Default admin user: admin/admin (change password immediately!)")
+
 # Create the Flask application
 app = create_app()
 
 if __name__ == '__main__':
     # Only print startup messages in the main process, not the reloader
     if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
-        print(f"Starting {app.config.get('API_NAME', 'Dokemon API')} on port {app.config.get('PORT', 9090)}...")
-        print("Docker Management API - A RESTful interface for Docker operations")
-        print("Make sure Docker is running and accessible via /var/run/docker.sock")
-        print(f"API Documentation available at: http://localhost:{app.config.get('PORT', 9090)}/")
-        print("\n📁 Modular Structure:")
-        print("   - Health & Documentation: /health, /")
-        print("   - Containers: /api/v1/containers/*")
-        print("   - Images: /api/v1/images/*")
-        print("   - Networks: /api/v1/networks/*") 
-        print("   - Volumes: /api/v1/volumes/*")
-        print("   - System: /api/v1/system/*")
-        print("   - Users: /api/v1/users/*")
-        print("\n🔐 Authentication:")
-        print("   - Create User: POST /api/v1/users")
-        print("   - Login: POST /api/v1/users/login")
-        print("   - Logout: POST /api/v1/users/logout")
-        print("   - Change Password: POST /api/v1/users/changepassword")
-        print("   - Current User: GET /api/v1/users/me")
-        print("   Default admin user: admin/admin (change password immediately!)")
+        print_startup_info(app)
     
     app.run(
         host=app.config.get('HOST', '0.0.0.0'), 
