@@ -46,7 +46,7 @@
 - [Docker Troubleshooting](#docker-troubleshooting)
 
 ### **API Documentation**
-- [Authentication System](#authentication-system)
+- [Authentication System](#user-authentication)
 - [Container Management](#container-management)
 - [Image Management](#image-management)
 - [Network Management](#network-management)
