@@ -13,64 +13,64 @@
 <p align="center"><em>Part of the Dokemon project ecosystem</em></p>
 
 <p align="center">
-<a href="#-quick-start">🚀 Quick Start</a> • 
-<a href="#-api-documentation">📖 Documentation</a> • 
-<a href="#-docker-deployment">🐳 Docker Deployment</a> • 
-<a href="#-development-guide">🛠️ Development</a>
+<a href="#quick-start">Quick Start</a> • 
+<a href="#api-documentation">Documentation</a> • 
+<a href="#docker-deployment">Docker Deployment</a> • 
+<a href="#development-guide">Development</a>
 </p>
 
 </div>
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 
-### **🏠 Overview**
-- [✨ Features](#-features)
-- [🏗️ Project Structure](#️-project-structure)
-- [📋 Prerequisites](#-prerequisites)
+### **Overview**
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
 
-### **⚡ Getting Started**
-- [🚀 Quick Start](#-quick-start)
-- [🛠️ Installation](#️-installation)
+### **Getting Started**
+- [Quick Start](#quick-start)
+- [Installation](#installation)
   - [Windows Installation](#windows-installation)
   - [macOS/Linux Installation](#macoslinux-installation)
-- [🌐 Server Configuration](#-server-configuration)
+- [Server Configuration](#server-configuration)
 
-### **🐳 Docker Deployment**
-- [🎯 Docker Overview](#-docker-overview)
-- [🚀 Quick Start with Docker Compose](#-quick-start-with-docker-compose)
-- [🔧 Manual Docker Build](#-manual-docker-build)
-- [⚙️ Docker Configuration](#️-docker-configuration)
-- [🏭 Production Deployment](#-production-deployment)
-- [🔍 Docker Troubleshooting](#-docker-troubleshooting)
+### **Docker Deployment**
+- [Docker Overview](#docker-overview)
+- [Quick Start with Docker Compose](#quick-start-with-docker-compose)
+- [Manual Docker Build](#manual-docker-build)
+- [Docker Configuration](#docker-configuration)
+- [Production Deployment](#production-deployment)
+- [Docker Troubleshooting](#docker-troubleshooting)
 
-### **📚 API Documentation**
-- [🔐 Authentication System](#-authentication-system)
-- [🐳 Container Management](#-container-management)
-- [🖼️ Image Management](#️-image-management)
-- [🌐 Network Management](#-network-management)
-- [💾 Volume Management](#-volume-management)
-- [📊 System Operations](#-system-operations)
-- [🎯 Usage Examples](#-usage-examples)
+### **API Documentation**
+- [Authentication System](#authentication-system)
+- [Container Management](#container-management)
+- [Image Management](#image-management)
+- [Network Management](#network-management)
+- [Volume Management](#volume-management)
+- [System Operations](#system-operations)
+- [Usage Examples](#usage-examples)
 
-### **⚙️ Configuration & Security**
-- [🔧 Environment Variables](#-environment-variables)
-- [🔒 Security Considerations](#-security-considerations)
-- [📝 Response Formats](#-response-formats)
+### **Configuration & Security**
+- [Environment Variables](#environment-variables)
+- [Security Considerations](#security-considerations)
+- [Response Formats](#response-formats)
 
-### **🛠️ Development & Support**
-- [🐛 Troubleshooting](#-troubleshooting)
-- [🔧 Development Guide](#-development-guide)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
-- [🌟 Version History](#-version-history)
+### **Development & Support**
+- [Troubleshooting](#troubleshooting)
+- [Development Guide](#development-guide)
+- [Contributing](#contributing)
+- [License](#license)
+- [Version History](#version-history)
 
 ---
 
-## ✨ Features
+## Features
 
-### 🐳 **Docker Management**
+### **Docker Management**
 - **Complete Container Management**: Start, stop, restart, remove, run new containers with advanced options
 - **Image Management**: List, pull, remove, build images with detailed information
 - **Network Management**: Create, list, remove networks with structured data
@@ -78,20 +78,20 @@
 - **System Operations**: Get detailed info, stats, and cleanup operations
 - **Logging & Monitoring**: View container logs and real-time resource usage
 
-### 🔐 **Security & Authentication**
+### **Security & Authentication**
 - **User Authentication & Session Management**: Secure API access with login/logout
 - **Password Management**: PBKDF2 hashing with secure password change functionality
 - **Session-based Security**: Configurable session timeouts and secure cookies
 - **Default Admin Setup**: Ready-to-use admin account with forced password change
 
-### 🏗️ **Architecture & Performance**
+### **Architecture & Performance**
 - **Modular Architecture**: Clean, maintainable code structure using Flask Blueprints
 - **Structured JSON Responses**: All endpoints return clean, parsed JSON data
 - **Professional Error Handling**: Comprehensive error responses and timeout management
 - **Environment-Based Configuration**: Flexible config management with environment variables
 - **Optimized Docker Image**: Multi-stage build produces ~142MB image (10x smaller than standard Docker installs)
 
-### 🌍 **Platform Support**
+### **Platform Support**
 - **Cross-Platform Support**: Works on Windows, macOS, and Linux
 - **Docker Desktop Compatibility**: Special handling for Windows Docker Desktop socket access
 - **Containerized Deployment**: Ready-to-use Docker containers with Docker Compose support
@@ -99,9 +99,9 @@
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
-### ⚡ **Fastest Setup (Docker)**
+### **Fastest Setup (Docker)**
 ```bash
 # Clone repository
 git clone <repository-url>
@@ -114,7 +114,7 @@ docker-compose up -d
 curl http://localhost:9090/health
 ```
 
-### 🖥️ **Native Installation**
+### **Native Installation**
 
 **Windows:**
 ```cmd
@@ -126,10 +126,10 @@ setup_windows.bat && start_windows.bat
 chmod +x setup.sh && ./setup.sh && python app.py
 ```
 
-### 🔑 **First Access**
+### **First Access**
 1. **API Health**: http://localhost:9090/health
 2. **Documentation**: http://localhost:9090/
-3. **Default Login**: `admin` / `admin` ⚠️ *Change immediately!*
+3. **Default Login**: `admin` / `admin` (Change immediately!)
 
 ---
 
@@ -206,7 +206,7 @@ dokemon-api/
 - Docker installed and running
 - Access to Docker socket (`/var/run/docker.sock` on Unix, named pipe on Windows)
 
-## 🛠️ Installation
+## Installation
 
 ### Windows Installation
 
@@ -260,7 +260,7 @@ python app.py
 
 ---
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 ### Optimized Docker Image
 
@@ -512,9 +512,9 @@ ports:
 DOKEMON_PORT=8080 docker-compose up -d
 ```
 
-## 🌐 Server Configuration
+## Server Configuration
 
-### 🎛️ **Environment Variables**
+### **Environment Variables**
 
 The API server runs on `http://localhost:9090` by default and supports extensive configuration:
 
@@ -554,7 +554,7 @@ export DOKEMON_ALLOWED_HOSTS=*       # Comma-separated allowed hosts
 export DOKEMON_LOG_LEVEL=INFO        # Log level (DEBUG, INFO, WARNING, ERROR)
 ```
 
-### 🎨 **Application Startup**
+### **Application Startup**
 
 When you run the API, you'll see a comprehensive startup display:
 
@@ -564,7 +564,7 @@ Docker Management API - A RESTful interface for Docker operations
 Make sure Docker is running and accessible via /var/run/docker.sock
 API Documentation available at: http://localhost:9090/
 
-📁 Modular Structure:
+Modular Structure:
    - Health & Documentation: /health, /
    - Containers: /api/v1/containers/*
    - Images: /api/v1/images/*
@@ -573,7 +573,7 @@ API Documentation available at: http://localhost:9090/
    - System: /api/v1/system/*
    - Users: /api/v1/users/*
 
-🔐 Authentication:
+Authentication:
    - Create User: POST /api/v1/users
    - Login: POST /api/v1/users/login
    - Logout (JSON): POST /api/v1/users/logout
@@ -583,7 +583,7 @@ API Documentation available at: http://localhost:9090/
    Default admin user: admin/admin (change password immediately!)
 ```
 
-### 🏗️ **Configuration Classes**
+### **Configuration Classes**
 
 The API uses a sophisticated configuration system with multiple environments:
 
@@ -595,7 +595,7 @@ The API uses a sophisticated configuration system with multiple environments:
 
 ---
 
-## 📚 API Documentation
+## API Documentation
 
 ### Health & System Check
 - `GET /health` - Check Docker daemon status and API health
@@ -626,7 +626,7 @@ curl http://localhost:9090/docker-debug
 
 The endpoint provides actionable troubleshooting steps and exact commands to fix issues.
 
-### 🔐 User Authentication (NOT YET)
+### User Authentication
 
 The Dokemon API includes a comprehensive authentication system with session-based login, secure password hashing (PBKDF2), and user management capabilities.
 
@@ -864,7 +864,7 @@ curl -X POST http://localhost:9090/api/v1/users/changepassword \
 # 5. Logout
 curl -X POST http://localhost:9090/api/v1/users/logout -b cookies.txt
 ```
-### 🐳 Container Management
+### Container Management
 
 #### List Containers
 ```bash
@@ -913,7 +913,7 @@ Content-Type: application/json
 }
 ```
 
-### 🖼️ Image Management
+### Image Management
 
 #### List Images
 ```bash
@@ -939,7 +939,7 @@ Returns structured data:
 - `DELETE /api/v1/images/{id}/remove?force=true` - Remove image
 - `POST /api/v1/images/build` - Build image from Dockerfile
 
-### 🌐 Network Management
+### Network Management
 
 #### List Networks
 ```bash
@@ -963,7 +963,7 @@ Returns structured network data:
 - `POST /api/v1/networks/create` - Create network
 - `DELETE /api/v1/networks/{name}/remove` - Remove network
 
-### 💾 Volume Management
+### Volume Management
 
 #### List Volumes
 ```bash
@@ -985,7 +985,7 @@ Returns structured volume data:
 - `POST /api/v1/volumes/create` - Create volume
 - `DELETE /api/v1/volumes/{name}/remove` - Remove volume
 
-### 📊 System Operations
+### System Operations
 
 #### System Information
 - `GET /api/v1/system/info` - Detailed Docker system information
@@ -1015,7 +1015,7 @@ Returns structured volume data:
 }
 ```
 
-## 🎯 Usage Examples
+## Usage Examples
 
 ### Authentication Setup
 
@@ -1156,7 +1156,7 @@ curl "http://localhost:9090/api/v1/system/stats?no-stream=true" -b cookies.txt
 curl -X POST "http://localhost:9090/api/v1/system/prune?force=true" -b cookies.txt
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -1189,7 +1189,7 @@ The API uses a sophisticated configuration system:
 - **DevelopmentConfig**: Debug enabled, verbose logging
 - **ProductionConfig**: Debug disabled, optimized for production
 
-## 🔒 Security Considerations
+## Security Considerations
 
 - **Docker Socket Access**: API requires access to Docker socket - use in trusted environments
 - **Authentication**: ✅ **Implemented** - Session-based authentication with PBKDF2 password hashing
@@ -1200,7 +1200,7 @@ The API uses a sophisticated configuration system:
 - **Command Execution**: API can execute arbitrary commands in containers
 - **Resource Limits**: No built-in resource limiting - monitor usage
 
-## 📝 Response Format
+## Response Format
 
 ### Success Response
 ```json
@@ -1228,7 +1228,7 @@ The API uses a sophisticated configuration system:
 }
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -1364,7 +1364,7 @@ def new_utility_function():
 
 The Dokemon API is now configured to use **Gunicorn** as the production WSGI server for better performance, reliability, and scalability.
 
-#### 🚀 Quick Start (Production)
+#### Quick Start (Production)
 
 ```bash
 # Using the production startup script
@@ -1376,7 +1376,7 @@ export DOKEMON_DEBUG=false
 gunicorn --config gunicorn.conf.py app:app
 ```
 
-#### 🔧 Development Mode
+#### Development Mode
 
 For development, you can still use Flask's built-in server:
 
@@ -1390,7 +1390,7 @@ export DOKEMON_DEBUG=true
 python app.py
 ```
 
-#### ⚙️ Gunicorn Configuration
+#### Gunicorn Configuration
 
 The API includes a comprehensive Gunicorn configuration file (`gunicorn.conf.py`) with:
 
@@ -1399,7 +1399,7 @@ The API includes a comprehensive Gunicorn configuration file (`gunicorn.conf.py`
 - **Logging**: Structured access and error logging to stdout/stderr
 - **Security**: Request size limits and other security settings
 
-#### 🌐 Environment Variables
+#### Environment Variables
 
 Control Gunicorn behavior with these environment variables:
 
@@ -1417,7 +1417,7 @@ export FLASK_ENV=production           # Default: production
 export DOKEMON_DEBUG=false           # Default: false
 ```
 
-#### 🎯 Production Deployment Options
+#### Production Deployment Options
 
 **Option 1: Systemd Service (Recommended)**
 
@@ -1474,7 +1474,7 @@ export DOKEMON_DEBUG=false
 gunicorn --config gunicorn.conf.py app:app
 ```
 
-#### 📊 Performance Benefits
+#### Performance Benefits
 
 Using Gunicorn provides several advantages over Flask's development server:
 
@@ -1495,7 +1495,7 @@ python -m pytest utils/test_parsers.py
 python -m pytest tests/
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create feature branch: `git checkout -b feature/new-endpoint`
@@ -1511,25 +1511,25 @@ python -m pytest tests/
 - **Config**: Add new configuration options to `config.py`
 - **Documentation**: Update README for new features
 
-## 📄 License
+## License
 
 This project is part of the Dokemon ecosystem. See project license for details.
 
-## 🌟 Version History
+## Version History
 
 ### **v1.1.20250712** *(Production-Ready WSGI Server)*
 **Enhanced production deployment with Gunicorn WSGI server:**
 
-- **🚀 Gunicorn Integration**: Production-ready WSGI server replacing Flask development server
-- **⚙️ Auto-scaling Configuration**: Intelligent worker process management based on CPU cores
-- **🔧 Comprehensive Configuration**: Dedicated `gunicorn.conf.py` with performance tuning
-- **📜 Startup Scripts**: Dedicated `start-prod.sh` and `start-dev.sh` for different environments
-- **🔧 Systemd Service**: Ready-to-use systemd service file for Linux deployments
-- **🐳 Updated Docker**: Container now uses Gunicorn by default for production deployments
-- **📊 Performance Improvements**: Better request handling, worker recycling, and resource management
-- **🔍 Enhanced Logging**: Structured access logs and error handling for production monitoring
-- **⚡ Graceful Shutdowns**: Proper signal handling for zero-downtime deployments
-- **📖 Documentation Updates**: Comprehensive production deployment guide with multiple options
+- **Gunicorn Integration**: Production-ready WSGI server replacing Flask development server
+- **Auto-scaling Configuration**: Intelligent worker process management based on CPU cores
+- **Comprehensive Configuration**: Dedicated `gunicorn.conf.py` with performance tuning
+- **Startup Scripts**: Dedicated `start-prod.sh` and `start-dev.sh` for different environments
+- **Systemd Service**: Ready-to-use systemd service file for Linux deployments
+- **Updated Docker**: Container now uses Gunicorn by default for production deployments
+- **Performance Improvements**: Better request handling, worker recycling, and resource management
+- **Enhanced Logging**: Structured access logs and error handling for production monitoring
+- **Graceful Shutdowns**: Proper signal handling for zero-downtime deployments
+- **Documentation Updates**: Comprehensive production deployment guide with multiple options
 
 *This release transforms the API into a production-ready service with enterprise-grade WSGI server capabilities, significantly improving performance, reliability, and deployment flexibility.*
 
