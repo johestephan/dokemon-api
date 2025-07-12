@@ -1,0 +1,50 @@
+# Git files
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Development files
+.vscode/
+.idea/
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Virtual environments
+venv/
+env/
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# User data (will be mounted as volume)
+users.json
+*.json
+
+# Backup files
+backup/
+
+# Development scripts
+setup.sh
+setup_windows.*
+start_windows.bat
+get-cookie.sh
+
+# API testing files
+*.paw
+dokemon-cookie.txt
+
+# SSL certificates (use volume mount instead)
+ssl/
+*.pem
+*.key
+*.crt
