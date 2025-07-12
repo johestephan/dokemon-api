@@ -48,6 +48,7 @@ echo ""
 echo "🚀 Starting Dokemon API container..."
 docker run -d \
     --name "$CONTAINER_NAME" \
+    -u root \
     -p "$HOST_PORT:$CONTAINER_PORT" \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v dokemon_data:/app/data \
@@ -79,3 +80,4 @@ else
     echo "❌ Failed to start container!"
     exit 1
 fi
+
